@@ -12,7 +12,10 @@ export default function Sheet({ title, emoji, children }: { title: string; emoji
             <span className="text-xl">{emoji}</span>
             <h2 className="text-sm font-black text-slate-900">{title}</h2>
           </div>
-          <button onClick={() => setTab('map')} className="w-7 h-7 rounded-full bg-slate-100 text-slate-500 text-xs font-black active:scale-90 transition-transform">
+          <button
+            onClick={() => setTab('map')}
+            className="w-7 h-7 rounded-full bg-slate-100 text-slate-500 text-xs font-black active:scale-90 transition-transform"
+          >
             ✕
           </button>
         </div>
@@ -22,20 +25,34 @@ export default function Sheet({ title, emoji, children }: { title: string; emoji
   );
 }
 
-export function Segments<T extends string>({ value, onChange, items }: { value: T; onChange: (v: T) => void; items: { id: T; label: string }[] }) {
+export function Segments<T extends string>({
+  value,
+  onChange,
+  items,
+}: {
+  value: T;
+  onChange: (v: T) => void;
+  items: { id: T; label: string; emoji?: string }[];
+}) {
   return (
-    <div className="flex gap-1 p-1 rounded-2xl bg-slate-100 mb-2.5">
-      {items.map((i) => (
-        <button
-          key={i.id}
-          onClick={() => onChange(i.id)}
-          className={`flex-1 py-1.5 rounded-xl text-xs font-black transition-all active:scale-95 ${
-            value === i.id ? 'bg-white text-emerald-700 shadow' : 'text-slate-500'
-          }`}
-        >
-          {i.label}
-        </button>
-      ))}
+    <div className="mb-2.5">
+      <div className="flex gap-1 p-1 rounded-2xl bg-slate-100 overflow-x-auto snap-x snap-mandatory no-scrollbar">
+        {items.map((i) => (
+          <button
+            key={i.id}
+            onClick={(e) => {
+              onChange(i.id);
+              e.currentTarget.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+            }}
+            className={`shrink-0 snap-center min-w-[72px] flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-xl text-[11px] font-black whitespace-nowrap transition-all active:scale-95 ${
+              value === i.id ? 'bg-white text-emerald-700 shadow' : 'text-slate-500'
+            }`}
+          >
+            {i.emoji && <span className="text-lg leading-none">{i.emoji}</span>}
+            <span>{i.label}</span>
+          </button>
+        ))}
+      </div>
     </div>
   );
 }
