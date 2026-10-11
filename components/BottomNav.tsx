@@ -1,5 +1,6 @@
 import React from 'react';
 import { Tab, useGame } from '../game/store';
+import { sound } from '../game/sound';
 
 const TABS: { id: Tab; emoji: string; label: string }[] = [
   { id: 'map', emoji: '🗺️', label: 'Map' },
@@ -20,7 +21,10 @@ export default function BottomNav() {
           return (
             <button
               key={t.id}
-              onClick={() => setTab(t.id)}
+              onClick={() => {
+                sound.click();
+                setTab(t.id);
+              }}
               className={`flex-1 rounded-2xl flex flex-col items-center justify-center gap-0 transition-all duration-150 active:scale-95 ${
                 active ? 'bg-emerald-600 text-white shadow-md' : 'text-slate-500'
               }`}

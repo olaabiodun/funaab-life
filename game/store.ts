@@ -38,7 +38,20 @@ export const fmtTime = (minutes: number) => {
 };
 export const naira = (n: number) => `₦${Math.round(n).toLocaleString()}`;
 
+export interface StudentProfile {
+  name: string;
+  matricNo: string;
+  departmentId: string;
+  traitId: string;
+  avatar: string;
+  gender: 'comrade_m' | 'comrade_f';
+}
+
+export type MeSegment = 'profile' | 'schedule' | 'yarns' | 'quests' | 'bag' | 'log';
+
 interface Game {
+  onboarded: boolean;
+  profile: StudentProfile;
   cash: number;
   energy: number;
   hunger: number;
@@ -57,7 +70,7 @@ interface Game {
 
   selected: string | null;
   tab: Tab;
-  meSeg: 'profile' | 'quests' | 'bag' | 'log';
+  meSeg: MeSegment;
   hustleSeg: 'jobs' | 'shop' | 'groove';
 
   setTab: (t: Tab) => void;
@@ -72,10 +85,22 @@ interface Game {
   buy: (id: string) => void;
   useItem: (id: string) => void;
   claim: (id: string) => void;
+  createProfile: (profile: StudentProfile) => void;
   reset: () => void;
 }
 
+const defaultProfile: StudentProfile = {
+  name: 'Comrade Student',
+  matricNo: '2024/0421',
+  departmentId: 'csc',
+  traitId: 'scholar',
+  avatar: '😎',
+  gender: 'comrade_m',
+};
+
 const initial = {
+  onboarded: false,
+  profile: defaultProfile,
   cash: 5000,
   energy: 90,
   hunger: 75,
@@ -90,7 +115,7 @@ const initial = {
   claimed: [] as string[],
   bag: {} as Record<string, number>,
   logs: [
-    { id: 0, text: '🎒 Welcome to Campus Life! Tap any pin on the map to explore. Sapa is real — go hustle.', kind: 'info' as LogKind, t: '8:00 AM' },
+    { id: 0, text: '🎒 Welcome to FUNAAB! You just arrived at the School Gate. Grab a shuttle or trek in.', kind: 'info' as LogKind, t: '8:00 AM' },
   ] as LogItem[],
 };
 
@@ -276,12 +301,35 @@ export const useGame = create<Game>()(
           get().notify(`🏅 Quest done! +${naira(q.reward.cash)}`, 'good');
         },
 
+        createProfile: (prof) => {
+          const trait = prof.traitId === 'hustler' ? { cash: 10000, energy: 90, sanity: 90, social: 40 }
+            : prof.traitId === 'politician' ? { cash: 6000, energy: 90, sanity: 90, social: 70 }
+            : prof.traitId === 'baller' ? { cash: 7500, energy: 100, sanity: 95, social: 50 }
+            : { cash: 5000, energy: 90, sanity: 90, social: 40 };
+
+          set({
+            onboarded: true,
+            profile: prof,
+            ...trait,
+            logs: [
+              {
+                id: uid++,
+                text: `🎓 Matriculation Complete! Welcome to FUNAAB, ${prof.name} (${prof.matricNo}). Your journey begins!`,
+                kind: 'good',
+                t: '8:00 AM',
+              },
+            ],
+          });
+          get().notify(`🎉 Welcome ${prof.name}!`, 'good');
+        },
+
         reset: () => set({ ...initial, toast: null, selected: null, tab: 'map' }),
       };
     },
     {
-      name: 'campus-life-save-v1',
+      name: 'campus-life-save-v2',
       partialize: (s) => ({
+        onboarded: s.onboarded, profile: s.profile,
         cash: s.cash, energy: s.energy, hunger: s.hunger, sanity: s.sanity, social: s.social, xp: s.xp,
         day: s.day, minutes: s.minutes, location: s.location, counters: s.counters, claimed: s.claimed,
         bag: s.bag, logs: s.logs,
@@ -291,4 +339,7 @@ export const useGame = create<Game>()(
 );
 
 export const levelOf = (xp: number) => Math.floor(xp / 100) + 1;
-export const gpaOf = (lectures: number, xp: number) => Math.min(5, 2.4 + lectures * 0.1 + xp / 400);
+export const gpaOf = (lectures: number, xp: number, traitId?: string) => {
+  const boost = traitId === 'scholar' ? 0.35 : 0;
+  return Math.min(5, 2.4 + boost + lectures * 0.12 + xp / 380);
+};

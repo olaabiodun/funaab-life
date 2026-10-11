@@ -1,6 +1,7 @@
 import React from 'react';
 import { fmtTime, gpaOf, levelOf, naira, useGame } from '../game/store';
 import { PLACE_MAP } from '../game/data';
+import { sound } from '../game/sound';
 
 const barColor = (v: number) => (v > 60 ? 'bg-emerald-500' : v > 30 ? 'bg-amber-400' : 'bg-rose-500');
 
@@ -32,26 +33,40 @@ export default function Hud() {
       <div className="pointer-events-auto max-w-xl mx-auto rounded-2xl bg-white/90 backdrop-blur-md shadow-lg border border-white/70 px-2.5 py-1.5">
         <div className="flex items-center gap-2">
           <button
-            onClick={() => { s.setTab('me'); useGame.setState({ meSeg: 'profile' }); }}
-            className="relative w-9 h-9 shrink-0 rounded-xl bg-emerald-600 text-white flex flex-col items-center justify-center active:scale-95 transition-transform"
+            onClick={() => {
+              sound.click();
+              s.setTab('me');
+              useGame.setState({ meSeg: 'profile' });
+            }}
+            className="relative w-10 h-10 shrink-0 rounded-2xl bg-gradient-to-br from-emerald-600 to-teal-700 text-white flex flex-col items-center justify-center shadow-md active:scale-95 transition-transform"
           >
-            <span className="text-[15px] leading-none">🎓</span>
-            <span className="text-[9px] font-black leading-none">Lv{lvl}</span>
-            <span className="absolute -bottom-0.5 inset-x-1 h-[3px] rounded-full bg-emerald-900/40 overflow-hidden">
+            <span className="text-[17px] leading-none">{s.profile.avatar || '🎓'}</span>
+            <span className="text-[8px] font-black leading-none mt-0.5">Lv{lvl}</span>
+            <span className="absolute -bottom-0.5 inset-x-1 h-[3px] rounded-full bg-emerald-950/50 overflow-hidden">
               <span className="block h-full bg-amber-300" style={{ width: `${xpPct}%` }} />
             </span>
           </button>
           <div className="flex-1 min-w-0 leading-tight">
-            <div className="text-[11px] font-black text-slate-900 truncate">Campus Life · Day {s.day}</div>
-            <div className="text-[10px] font-bold text-slate-500">
-              {sunny ? '☀️' : '🌙'} {fmtTime(s.minutes)} · GPA {gpaOf(s.counters.lectures, s.xp).toFixed(2)}
+            <div className="flex items-center gap-1.5">
+              <span className="text-[11px] font-black text-slate-900 truncate">
+                {s.profile.name}
+              </span>
+              <span className="text-[9px] font-black text-emerald-700 bg-emerald-100/80 px-1.5 py-0.2 rounded-md">
+                D{s.day}
+              </span>
+            </div>
+            <div className="text-[10px] font-bold text-slate-500 truncate mt-0.5">
+              {sunny ? '☀️' : '🌙'} {fmtTime(s.minutes)} · GPA{' '}
+              <span className="text-emerald-700 font-black">
+                {gpaOf(s.counters.lectures, s.xp, s.profile.traitId).toFixed(2)}
+              </span>
             </div>
           </div>
-          <div className="px-2.5 py-1 rounded-xl bg-emerald-50 border border-emerald-200 text-sm font-black text-emerald-700 whitespace-nowrap">
+          <div className="px-2.5 py-1.5 rounded-2xl bg-emerald-50 border border-emerald-200/80 text-xs font-black text-emerald-800 whitespace-nowrap shadow-sm">
             💰 {naira(s.cash)}
           </div>
         </div>
-        <div className="flex gap-2.5 mt-1.5">
+        <div className="flex gap-2.5 mt-2">
           <Mini emoji="⚡" v={s.energy} />
           <Mini emoji="🍔" v={s.hunger} />
           <Mini emoji="🧠" v={s.sanity} />

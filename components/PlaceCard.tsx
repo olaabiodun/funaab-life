@@ -2,6 +2,7 @@ import React from 'react';
 import { PLACE_MAP } from '../game/data';
 import { fxDeltaText, useGame } from '../game/store';
 import { camApi, findPath, pathLength, travelCost } from '../game/world';
+import { sound } from '../game/sound';
 
 export default function PlaceCard() {
   const id = useGame((s) => s.selected);
@@ -35,7 +36,10 @@ export default function PlaceCard() {
           <div className="grid grid-cols-2 gap-2 mt-2.5">
             <button
               disabled={!!travel}
-              onClick={() => startTravel(id, 'walk')}
+              onClick={() => {
+                sound.click();
+                startTravel(id, 'walk');
+              }}
               className="py-2.5 rounded-2xl bg-emerald-600 text-white text-xs font-black active:scale-95 transition-all disabled:opacity-40"
             >
               🚶 Walk · {walkInfo.minutes}min
@@ -43,7 +47,10 @@ export default function PlaceCard() {
             </button>
             <button
               disabled={!!travel}
-              onClick={() => startTravel(id, 'shuttle')}
+              onClick={() => {
+                sound.horn();
+                startTravel(id, 'shuttle');
+              }}
               className="py-2.5 rounded-2xl bg-amber-400 text-slate-900 text-xs font-black active:scale-95 transition-all disabled:opacity-40"
             >
               🚐 Shuttle · {shuttleInfo.minutes}min
@@ -56,8 +63,12 @@ export default function PlaceCard() {
             {p.activities.map((a) => (
               <button
                 key={a.id}
-                onClick={() => perform(a, id)}
-                className="w-full flex items-center gap-2.5 p-2 rounded-2xl bg-white border border-slate-200 text-left active:scale-[0.98] transition-transform"
+                onClick={() => {
+                  if (a.reward) sound.cash();
+                  else sound.click();
+                  perform(a, id);
+                }}
+                className="w-full flex items-center gap-2.5 p-2 rounded-2xl bg-white border border-slate-200 text-left active:scale-[0.98] transition-transform shadow-sm"
               >
                 <span className="text-2xl w-9 text-center">{a.emoji}</span>
                 <span className="flex-1 min-w-0">

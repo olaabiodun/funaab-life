@@ -8,6 +8,7 @@ import PlacesPanel from './components/PlacesPanel';
 import HustlePanel from './components/HustlePanel';
 import MePanel from './components/MePanel';
 import CamControls from './components/CamControls';
+import OnboardingModal from './components/OnboardingModal';
 
 function Toast() {
   const toast = useGame((s) => s.toast);
@@ -65,6 +66,7 @@ export default function App() {
       <CamControls />
       <Toast />
       <Hint />
+      <OnboardingModal />
       {tab === 'map' && <PlaceCard />}
       {tab === 'places' && <PlacesPanel />}
       {tab === 'hustle' && <HustlePanel />}
