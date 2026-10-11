@@ -14,7 +14,7 @@ export default function BottomNav() {
   const setTab = useGame((s) => s.setTab);
   const claimable = useGame((s) => s.claimed.length);
   return (
-    <nav className="absolute bottom-10 inset-x-0 z-40 px-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] pointer-events-none">
+    <nav className="absolute  bottom-[-10px] inset-x-0 z-40 px-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] pointer-events-none">
       <div className="pointer-events-auto max-w-md mx-auto h-[58px] rounded-3xl bg-white/95 backdrop-blur-xl shadow-2xl border border-white/80 p-1 flex gap-1">
         {TABS.map((t) => {
           const active = tab === t.id;
